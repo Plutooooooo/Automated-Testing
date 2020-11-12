@@ -12,24 +12,27 @@ import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.util.CancelException;
 import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.io.FileProvider;
+import walatool.WalaAnalysis;
+import walatool.WalaAnalysisImpl;
 
 import java.io.File;
 import java.io.IOException;
 
 public class WalaTest {
     public static void main(String args[]) throws IOException, ClassHierarchyException, InvalidClassFileException, CancelException {
-        File exFile = new FileProvider().getFile("exclusion.txt");
+        WalaAnalysis walaAnalysis = new WalaAnalysisImpl();
+        AnalysisScope scope = walaAnalysis.setupAnalysisScope("E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\0-CMD\\target");
+        /*File exFile = new FileProvider().getFile("exclusion.txt");
         System.out.println(exFile.getAbsolutePath());
         AnalysisScope scope = AnalysisScopeReader.readJavaScope("scope.txt", exFile, WalaTest.class.getClassLoader());
         File test = new FileProvider().getFile("E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\1-ALU\\target\\classes\\net\\mooctest\\ALU.class");
         System.out.println(test);
-        scope.addClassFileToScope(ClassLoaderReference.Application, test);
+        scope.addClassFileToScope(ClassLoaderReference.Application, test);*/
         ClassHierarchy cha = ClassHierarchyFactory.makeWithRoot(scope);
-        System.out.println(scope);
-        System.out.println("----------------------------------------------");
         Iterable<Entrypoint> eps = new AllApplicationEntrypoints(scope, cha);
         CHACallGraph cg = new CHACallGraph(cha);
         cg.init(eps);
+        int i = 0;
         for (CGNode node : cg) {
             // node中包含了很多信息，包括类加载器、方法信息等，这里只筛选出需要的信息
             if (node.getMethod() instanceof ShrikeBTMethod) {
@@ -38,9 +41,11 @@ public class WalaTest {
                 // 使用Primordial类加载器加载的类都属于Java原生类，我们一般不关心。
                 if ("Application".equals(method.getDeclaringClass().getClassLoader().toString())) {
                     // 获取声明该方法的类的内部表示
+                    System.out.println(node.getGraphNodeId());
                     String classInnerName = method.getDeclaringClass().getName().toString();
                     String signature = method.getSignature();
                     System.out.println(classInnerName + " " + signature);
+                    System.out.println("----------");
                 }
             } else {
                 System.out.println(String.format("'%s'不是一个ShrikeBTMethod：%s", node.getMethod(), node.getMethod().getClass()));
