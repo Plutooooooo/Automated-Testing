@@ -1,3 +1,4 @@
+import com.ibm.wala.classLoader.CallSiteReference;
 import com.ibm.wala.classLoader.ShrikeBTMethod;
 import com.ibm.wala.ipa.callgraph.AnalysisScope;
 import com.ibm.wala.ipa.callgraph.CGNode;
@@ -9,6 +10,7 @@ import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.types.ClassLoaderReference;
+import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.util.CancelException;
 import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.io.FileProvider;
@@ -17,6 +19,7 @@ import walatool.WalaAnalysisImpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.*;
 
 public class WalaTest {
     public static void main(String args[]) throws IOException, ClassHierarchyException, InvalidClassFileException, CancelException {
@@ -33,6 +36,7 @@ public class WalaTest {
         CHACallGraph cg = new CHACallGraph(cha);
         cg.init(eps);
         int i = 0;
+        Set<String> methods = new HashSet<String>();
         for (CGNode node : cg) {
             // node中包含了很多信息，包括类加载器、方法信息等，这里只筛选出需要的信息
             if (node.getMethod() instanceof ShrikeBTMethod) {
@@ -45,12 +49,27 @@ public class WalaTest {
                     String classInnerName = method.getDeclaringClass().getName().toString();
                     String signature = method.getSignature();
                     System.out.println(classInnerName + " " + signature);
+                    System.out.println("context is " + node.getContext().toString());
+                    Collection<CallSiteReference> callSiteReferences = method.getCallSites();
+                    methods.add((classInnerName + " " + signature));
+                    for (CallSiteReference callSiteReference : callSiteReferences) {
+                        System.out.println("callsite: " + callSiteReference.toString());
+                    }
+                    System.out.println("----------");
+                    Iterator<CGNode> preNodes = cg.getPredNodes(node);
+                    for (Iterator<CGNode> it = preNodes; it.hasNext(); ) {
+                        CGNode prenode = it.next();
+                        ShrikeBTMethod preMethod = ((ShrikeBTMethod) prenode.getMethod());
+                        String preMethodDescription =preMethod.getDeclaringClass().getName().toString() + " " + preMethod.getSignature().toString();
+                        System.out.println("preMethod: "+preMethodDescription);
+                    }
                     System.out.println("----------");
                 }
-            } else {
+            }
+            else {
                 System.out.println(String.format("'%s'不是一个ShrikeBTMethod：%s", node.getMethod(), node.getMethod().getClass()));
             }
         }
+        System.out.println("setSize is " + methods.size());
     }
-
 }
