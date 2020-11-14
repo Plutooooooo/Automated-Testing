@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class WalaTest {
-    public static void main(String args[]) throws IOException, ClassHierarchyException, InvalidClassFileException, CancelException {
+    public static void main(String[] args) throws IOException, ClassHierarchyException, InvalidClassFileException, CancelException {
         WalaAnalysis walaAnalysis = new WalaAnalysisImpl();
         AnalysisScope scope = walaAnalysis.setupAnalysisScope("E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\0-CMD\\target");
         /*File exFile = new FileProvider().getFile("exclusion.txt");
@@ -37,7 +37,25 @@ public class WalaTest {
         cg.init(eps);
         int i = 0;
         Set<String> methods = new HashSet<String>();
-        for (CGNode node : cg) {
+        Set<String> testMethods = walaAnalysis.getSignatureOfTestMethods(cg);
+        Set<String> applicationMethods = walaAnalysis.getSignatureOfApplicationMethods(cg);
+        Hashtable<String, Set<String>> hashtable = walaAnalysis.recordMethodsCalledByTest(cg, testMethods);
+        for (String key : hashtable.keySet()) {
+            System.out.println("key is: " + key);
+            for (String s : hashtable.get(key)) {
+                System.out.println("method is: " + s);
+            }
+            System.out.println("----------");
+        }
+        Hashtable<String, Set<String>> classesCalledByTest = walaAnalysis.recordClassesCalledByTest(cg, hashtable);
+        for (String key : classesCalledByTest.keySet()) {
+            System.out.println("key is: " + key);
+            for (String s : classesCalledByTest.get(key)) {
+                System.out.println("class is: " + s);
+            }
+            System.out.println("----------");
+        }
+        /*for (CGNode node : cg) {
             // node中包含了很多信息，包括类加载器、方法信息等，这里只筛选出需要的信息
             if (node.getMethod() instanceof ShrikeBTMethod) {
                 // node.getMethod()返回一个比较泛化的IMethod实例，不能获取到我们想要的信息
@@ -56,13 +74,13 @@ public class WalaTest {
                         System.out.println("callsite: " + callSiteReference.toString());
                     }
                     System.out.println("----------");
-                    Iterator<CGNode> preNodes = cg.getPredNodes(node);
-                    for (Iterator<CGNode> it = preNodes; it.hasNext(); ) {
-                        CGNode prenode = it.next();
-                        ShrikeBTMethod preMethod = ((ShrikeBTMethod) prenode.getMethod());
-                        String preMethodDescription =preMethod.getDeclaringClass().getName().toString() + " " + preMethod.getSignature().toString();
-                        System.out.println("preMethod: "+preMethodDescription);
-                    }
+                    *//*Iterator<CGNode> succNodes = cg.getSuccNodes(node);
+                    for (Iterator<CGNode> it = succNodes; it.hasNext(); ) {
+                        CGNode succnode = it.next();
+                        ShrikeBTMethod succMethod = ((ShrikeBTMethod) succnode.getMethod());
+                        String succMethodDescription =succMethod.getDeclaringClass().getName().toString() + " " + succMethod.getSignature().toString();
+                        System.out.println("succMethod: "+succMethodDescription);
+                    }*//*
                     System.out.println("----------");
                 }
             }
@@ -70,6 +88,6 @@ public class WalaTest {
                 System.out.println(String.format("'%s'不是一个ShrikeBTMethod：%s", node.getMethod(), node.getMethod().getClass()));
             }
         }
-        System.out.println("setSize is " + methods.size());
+        System.out.println("setSize is " + methods.size());*/
     }
 }
