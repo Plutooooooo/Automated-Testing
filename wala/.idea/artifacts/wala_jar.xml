@@ -1,0 +1,16 @@
+<component name="ArtifactManager">
+  <artifact name="wala:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/wala_jar</output-path>
+    <root id="root">
+      <element id="archive" name="wala.jar">
+        <element id="module-output" name="CMD" />
+        <element id="module-output" name="wala" />
+      </element>
+      <element id="library" level="project" name="Maven: com.ibm.wala:com.ibm.wala.cast:1.5.4" />
+      <element id="library" level="project" name="Maven: com.ibm.wala:com.ibm.wala.shrike:1.5.4" />
+      <element id="library" level="project" name="Maven: commons-io:commons-io:2.4" />
+      <element id="library" level="project" name="Maven: com.ibm.wala:com.ibm.wala.util:1.5.4" />
+      <element id="library" level="project" name="Maven: com.ibm.wala:com.ibm.wala.core:1.5.4" />
+    </root>
+  </artifact>
+</component>

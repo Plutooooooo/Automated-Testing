@@ -2,6 +2,7 @@ package util;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.Set;
 
 public interface Util {
@@ -23,4 +24,18 @@ public interface Util {
      * @return
      */
     public Set<String> readChangedClasses(Set<String> changedMethods);
+
+    /**
+     * 将选中的测试用例签名写到指定路径
+     * @param path
+     * @param res
+     */
+    public void writeSelectionResultFile(String path, Set<String> res) throws IOException;
+
+    /**
+     * 生成dot文件的方法
+     * @param postFix 路径后的后缀(class/method)
+     * @param methodsDirectlyCalled
+     */
+    public void constructDotFile(String postFix, Hashtable<String, Set<String>> methodsDirectlyCalled) throws IOException;
 }

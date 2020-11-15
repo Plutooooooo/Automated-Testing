@@ -31,6 +31,8 @@ public class WalaTestSelector {
     private static Set<String> changedClasses;//通过change_info.txt读到的变更类的集合
     private static Hashtable<String, Set<String>> methodsCalledByTest;//测试方法调用的所有方法集合(包括直接和间接调用)
     private static Hashtable<String, Set<String>> classesCalledByTest;//测试方法调用的所有类集合(包括直接和间接调用)
+    private static Hashtable<String, Set<String>> methodsDirectlyCalled;//每个方法直接调用的方法，用于生成dot文件
+    private static Hashtable<String, Set<String>> classesDirectlyCalled;//每个方法直接调用的类，用于生成dot文件
 
 
     //初始化与Wala相关的信息，依据targetPath建立分析域
@@ -44,6 +46,8 @@ public class WalaTestSelector {
         applicationMethods = walaAnalysis.getSignatureOfApplicationMethods(cg);
         methodsCalledByTest = walaAnalysis.recordMethodsCalledByTest(cg, testMethods);
         classesCalledByTest = walaAnalysis.recordClassesCalledByTest(cg, methodsCalledByTest);
+        methodsDirectlyCalled = walaAnalysis.recordMethodsDirectlyCalled(cg);
+        classesDirectlyCalled = walaAnalysis.recordClassesDirectlyCalled(cg,methodsDirectlyCalled);
     }
 
     //获得变更信息
@@ -90,45 +94,34 @@ public class WalaTestSelector {
         return res;
     }
 
-    private static void boot(String[] args) throws IOException, InvalidClassFileException, CancelException, ClassHierarchyException {
-       /* String cmd = args[0];
+    private static void start(String[] args) throws IOException, InvalidClassFileException, CancelException, ClassHierarchyException {
+        String cmd = args[0];
         String targetPath = args[1];
-        String changeInfoPath = args[2];*/
-
-        String targetPath = "E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\0-CMD\\target";
-        String changeInfoPath = "E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\0-CMD\\data\\change_info.txt";
+        String changeInfoPath = args[2];
         initWalaInfo(targetPath);
         initChangeInfo(changeInfoPath);
         Set<String> res = new HashSet<String>();//测试用例选择结果
-        res = selectTestsOnClassLevel();
-        for(String s : res){
-            System.out.println("in class level res "+s);
-        }
-        System.out.println("-----------");
-
-        res = selectTestsOnMethodLevel();
-        for(String s : res){
-            System.out.println("in res "+s);
-        }
-        System.out.println("-----------");
-
         //-c执行类级别测试选择,-m执行方法级别测试选择
-        /*if (cmd.equals("-c")) {
+        if (cmd.equals("-c")) {
             res = selectTestsOnClassLevel();
-            for(String s : res){
-                System.out.println("in res "+s);
-            }
-            System.out.println("-----------");
+            util.writeSelectionResultFile("selection-class.txt",res);
+            util.constructDotFile("class",classesDirectlyCalled);
         } else {
             res = selectTestsOnMethodLevel();
-            for(String s : res){
-                System.out.println("in res "+s);
-            }
-            System.out.println("-----------");
-        }*/
+            util.writeSelectionResultFile("selection-method.txt",res);
+            util.constructDotFile("method",methodsDirectlyCalled);
+        }
+
     }
     public static void main(String[] args) throws CancelException, ClassHierarchyException, InvalidClassFileException, IOException {
-        boot(args);
+        start(args);
     }
 
 }
+
+    /*String targetPath = "E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\1-ALU\\target";
+           String changeInfoPath = "E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\1-ALU\\data\\change_info.txt";*/
+       /* String targetPath = "E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\0-CMD\\target";
+        String changeInfoPath = "E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\0-CMD\\data\\change_info.txt";*/
+  /*  String targetPath = "E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\2-DataLog\\target";
+    String changeInfoPath = "E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\2-DataLog\\data\\change_info.txt";*/

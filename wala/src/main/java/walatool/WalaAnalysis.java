@@ -61,4 +61,18 @@ public interface WalaAnalysis {
      */
 
     public Hashtable<String, Set<String>> recordClassesCalledByTest(CHACallGraph cg, Hashtable<String, Set<String>> methodsCalledByTest);
+
+    /**
+     * 记录下每个方法直接调用的其它方法，用于后续生成dot文件
+     * @param cg
+     * @return
+     */
+    public Hashtable<String, Set<String>> recordMethodsDirectlyCalled(CHACallGraph cg);
+
+    /**
+     * 记录下每个方法直接调用的其它类，用于后续生成dot文件
+     * @param cg
+     * @return
+     */
+    public Hashtable<String, Set<String>> recordClassesDirectlyCalled(CHACallGraph cg, Hashtable<String, Set<String>> methodsDirectlyCalled);
 }
