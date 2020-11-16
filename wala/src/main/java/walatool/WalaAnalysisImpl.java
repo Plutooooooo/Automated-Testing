@@ -149,8 +149,11 @@ public class WalaAnalysisImpl implements WalaAnalysis {
 
     public Hashtable<String, Set<String>> recordClassesDirectlyCalled(CHACallGraph cg, Hashtable<String, Set<String>> methodsDirectlyCalled) {
         Hashtable<String, Set<String>> hashtable = new Hashtable<String, Set<String>>();
+        for(String key : methodsDirectlyCalled.keySet()){
+            hashtable.put(key.split(" ")[0],new HashSet<String>());
+        }
         for (String key : methodsDirectlyCalled.keySet()) {
-            Set<String> calledClasses = new HashSet<String>();
+            Set<String> calledClasses = hashtable.get(key.split(" ")[0]);
             for (String methods : methodsDirectlyCalled.get(key)) {
                 //按空格分割，第一个字符串就是InnerClassName
                 String innerClassName = methods.split(" ")[0];

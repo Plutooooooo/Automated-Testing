@@ -34,6 +34,9 @@ public class WalaTestSelector {
     private static Hashtable<String, Set<String>> methodsDirectlyCalled;//每个方法直接调用的方法，用于生成dot文件
     private static Hashtable<String, Set<String>> classesDirectlyCalled;//每个方法直接调用的类，用于生成dot文件
 
+    //类级别测试选择理解错了，修改部分
+    private static Hashtable<String, Set<String>> methodsUnderTestClass;//记录每个测试类下有哪些方法，类级别测试选择时，一个类改动，调用这个类的测试类的全部方法都要选择
+
 
     //初始化与Wala相关的信息，依据targetPath建立分析域
     private static void initWalaInfo(String targetPath) throws IOException, InvalidClassFileException, ClassHierarchyException, CancelException {
@@ -98,17 +101,19 @@ public class WalaTestSelector {
         String cmd = args[0];
         String targetPath = args[1];
         String changeInfoPath = args[2];
+        System.out.println("xxxxxxxxx");
+        System.out.println(System.getProperty("user.dir"));
         initWalaInfo(targetPath);
         initChangeInfo(changeInfoPath);
         Set<String> res = new HashSet<String>();//测试用例选择结果
         //-c执行类级别测试选择,-m执行方法级别测试选择
         if (cmd.equals("-c")) {
             res = selectTestsOnClassLevel();
-            util.writeSelectionResultFile("selection-class.txt",res);
+            util.writeSelectionResultFile(System.getProperty("user.dir")+"/selection-class.txt",res);
             util.constructDotFile("class",classesDirectlyCalled);
         } else {
             res = selectTestsOnMethodLevel();
-            util.writeSelectionResultFile("selection-method.txt",res);
+            util.writeSelectionResultFile(System.getProperty("user.dir")+"/selection-method.txt",res);
             util.constructDotFile("method",methodsDirectlyCalled);
         }
 

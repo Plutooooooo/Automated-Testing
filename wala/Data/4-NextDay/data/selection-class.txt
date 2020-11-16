@@ -59,4 +59,3 @@ Lnet/mooctest/MonthTest net.mooctest.MonthTest.testEquals5()V
 Lnet/mooctest/YearTest net.mooctest.YearTest.testEquals2()V
 Lnet/mooctest/MonthTest net.mooctest.MonthTest.testSetMonth2()V
 Lnet/mooctest/CalendarUnitTest net.mooctest.CalendarUnitTest.test0()V
-
