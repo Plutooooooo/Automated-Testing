@@ -164,6 +164,36 @@ public class WalaAnalysisImpl implements WalaAnalysis {
         return hashtable;
     }
 
+    @Override
+    public Hashtable<String, Set<String>> recordMethodsUnderTestClass(Set<String> testMethods) {
+        Hashtable<String, Set<String>> hashtable = new Hashtable<String, Set<String>>();
+        for(String testMethod : testMethods){
+            String testClass = testMethod.split(" ")[0];
+            if(!hashtable.containsKey(testClass)){
+                hashtable.put(testClass,new HashSet<String>());
+            }else{
+                Set<String> methodsUnderTestClass = hashtable.get(testClass);
+                methodsUnderTestClass.add(testMethod.split(" ")[1]);
+            }
+        }
+        return hashtable;
+    }
+
+    @Override
+    public Hashtable<String, Set<String>> recordClassesCalledByTestClass(Hashtable<String, Set<String>> classesCalledByTest) {
+        Hashtable<String, Set<String>> hashtable = new Hashtable<String, Set<String>>();
+        for(String s : classesCalledByTest.keySet()){
+            String testClass = s.split(" ")[0];
+            if(!hashtable.containsKey(testClass)){
+                hashtable.put(testClass,new HashSet<String>());
+            }
+            Set<String> classesCalled = hashtable.get(testClass);
+            classesCalled.addAll(classesCalledByTest.get(s));
+            hashtable.put(testClass,classesCalled);
+        }
+        return hashtable;
+    }
+
 
     /**
      * 深搜遍历调用图，获取测试用例直接/间接调用的所有生产代码方法

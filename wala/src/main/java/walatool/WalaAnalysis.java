@@ -64,6 +64,7 @@ public interface WalaAnalysis {
 
     /**
      * 记录下每个方法直接调用的其它方法，用于后续生成dot文件
+     *
      * @param cg
      * @return
      */
@@ -71,8 +72,24 @@ public interface WalaAnalysis {
 
     /**
      * 记录下每个方法直接调用的其它类，用于后续生成dot文件
+     *
      * @param cg
      * @return
      */
     public Hashtable<String, Set<String>> recordClassesDirectlyCalled(CHACallGraph cg, Hashtable<String, Set<String>> methodsDirectlyCalled);
+
+    /**
+     * 记录测试类下有哪些测试方法
+     *
+     * @param testMethods
+     * @return
+     */
+    public Hashtable<String, Set<String>> recordMethodsUnderTestClass(Set<String> testMethods);
+
+    /**
+     * 记录测试类依赖了哪些类
+     * @param classesCalledByTest
+     * @return
+     */
+    public Hashtable<String, Set<String>> recordClassesCalledByTestClass(Hashtable<String, Set<String>> classesCalledByTest);
 }

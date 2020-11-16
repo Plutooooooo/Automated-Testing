@@ -36,6 +36,7 @@ public class WalaTestSelector {
 
     //类级别测试选择理解错了，修改部分
     private static Hashtable<String, Set<String>> methodsUnderTestClass;//记录每个测试类下有哪些方法，类级别测试选择时，一个类改动，调用这个类的测试类的全部方法都要选择
+    private static Hashtable<String, Set<String>> classesCalledByTestClass;//记录测试类依赖了哪些类
 
 
     //初始化与Wala相关的信息，依据targetPath建立分析域
@@ -50,7 +51,9 @@ public class WalaTestSelector {
         methodsCalledByTest = walaAnalysis.recordMethodsCalledByTest(cg, testMethods);
         classesCalledByTest = walaAnalysis.recordClassesCalledByTest(cg, methodsCalledByTest);
         methodsDirectlyCalled = walaAnalysis.recordMethodsDirectlyCalled(cg);
-        classesDirectlyCalled = walaAnalysis.recordClassesDirectlyCalled(cg,methodsDirectlyCalled);
+        classesDirectlyCalled = walaAnalysis.recordClassesDirectlyCalled(cg, methodsDirectlyCalled);
+        methodsUnderTestClass = walaAnalysis.recordMethodsUnderTestClass(testMethods);
+        classesCalledByTest = walaAnalysis.recordClassesCalledByTestClass(classesCalledByTest);
     }
 
     //获得变更信息
@@ -62,25 +65,29 @@ public class WalaTestSelector {
     //方法级别选取测试用例
     private static Set<String> selectTestsOnMethodLevel() {
         Set<String> res = new HashSet<String>();
-        for (String testMethod : testMethods) {
+        for (String key : classesCalledByTestClass.keySet()) {
+            Set<String> classesCalled = classesCalledByTestClass.get(key);
+            //若依赖的类发生变更则将flag置为true
             boolean flag = false;
-            for (String changedMethod : changedMethods) {
-                if (methodsCalledByTest.get(testMethod).contains(changedMethod)) {
+            for (String classCalled : classesCalled) {
+                if (changedClasses.contains(classCalled)) {
                     flag = true;
                     break;
                 }
             }
             if (flag) {
-                //说明该测试用例调用了这个变更的方法
-                res.add(testMethod);
+                //该测试类下的所有方法都要选中
+                res.addAll(methodsUnderTestClass.get(key));
             }
         }
+
         return res;
     }
 
     //类级别选取测试用例
     private static Set<String> selectTestsOnClassLevel() {
         Set<String> res = new HashSet<String>();
+
         for (String testMethod : testMethods) {
             boolean flag = false;
             for (String changedClass : changedClasses) {
@@ -101,23 +108,22 @@ public class WalaTestSelector {
         String cmd = args[0];
         String targetPath = args[1];
         String changeInfoPath = args[2];
-        System.out.println("xxxxxxxxx");
-        System.out.println(System.getProperty("user.dir"));
         initWalaInfo(targetPath);
         initChangeInfo(changeInfoPath);
         Set<String> res = new HashSet<String>();//测试用例选择结果
         //-c执行类级别测试选择,-m执行方法级别测试选择
         if (cmd.equals("-c")) {
             res = selectTestsOnClassLevel();
-            util.writeSelectionResultFile(System.getProperty("user.dir")+"/selection-class.txt",res);
-            util.constructDotFile("class",classesDirectlyCalled);
+            util.writeSelectionResultFile(System.getProperty("user.dir") + "/selection-class.txt", res);
+            util.constructDotFile("class", classesDirectlyCalled);
         } else {
             res = selectTestsOnMethodLevel();
-            util.writeSelectionResultFile(System.getProperty("user.dir")+"/selection-method.txt",res);
-            util.constructDotFile("method",methodsDirectlyCalled);
+            util.writeSelectionResultFile(System.getProperty("user.dir") + "/selection-method.txt", res);
+            util.constructDotFile("method", methodsDirectlyCalled);
         }
 
     }
+
     public static void main(String[] args) throws CancelException, ClassHierarchyException, InvalidClassFileException, IOException {
         start(args);
     }
