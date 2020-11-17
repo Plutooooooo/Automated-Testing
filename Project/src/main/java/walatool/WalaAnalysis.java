@@ -1,0 +1,95 @@
+package walatool;
+
+import com.ibm.wala.ipa.callgraph.AnalysisScope;
+import com.ibm.wala.ipa.callgraph.CallGraph;
+import com.ibm.wala.ipa.callgraph.cha.CHACallGraph;
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.shrikeCT.InvalidClassFileException;
+import com.ibm.wala.util.CancelException;
+
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Set;
+
+public interface WalaAnalysis {
+    /**
+     * 构建分析域，将targetPath下需要的.class文件加入分析域
+     *
+     * @param targetPath
+     */
+    public AnalysisScope setupAnalysisScope(String targetPath) throws IOException, InvalidClassFileException;
+
+    /**
+     * 根据AnalysisScope构建调用图
+     *
+     * @param analysisScope
+     * @return
+     */
+    public CHACallGraph constructCallGraph(AnalysisScope analysisScope) throws ClassHierarchyException, CancelException;
+
+    /**
+     * 把所有的测试方法的签名记录下来便于后续使用
+     *
+     * @param cg
+     * @return
+     */
+    public Set<String> getSignatureOfTestMethods(CHACallGraph cg);
+
+    /**
+     * 把所有的生产代码方法的签名记录下来便于后续使用
+     *
+     * @param cg
+     * @return
+     */
+    public Set<String> getSignatureOfApplicationMethods(CHACallGraph cg);
+
+    /**
+     * 记录每个测试方法调用的所有方法，包括直接调用和间接调用
+     *
+     * @param cg
+     * @param testMethodsSet 测试方法签名集合
+     * @return
+     */
+    public Hashtable<String, Set<String>> recordMethodsCalledByTest(CHACallGraph cg, Set<String> testMethodsSet);
+
+    /**
+     * 记录每个测试方法调用的所有类，包括直接调用和间接调用
+     *
+     * @param cg
+     * @param methodsCalledByTest 测试方法直接或间接调用的所有方法
+     * @return
+     */
+
+    public Hashtable<String, Set<String>> recordClassesCalledByTest(CHACallGraph cg, Hashtable<String, Set<String>> methodsCalledByTest);
+
+    /**
+     * 记录下每个方法直接调用的其它方法，用于后续生成dot文件
+     *
+     * @param cg
+     * @return
+     */
+    public Hashtable<String, Set<String>> recordMethodsDirectlyCalled(CHACallGraph cg);
+
+    /**
+     * 记录下每个方法直接调用的其它类，用于后续生成dot文件
+     *
+     * @param cg
+     * @return
+     */
+    public Hashtable<String, Set<String>> recordClassesDirectlyCalled(CHACallGraph cg, Hashtable<String, Set<String>> methodsDirectlyCalled);
+
+    /**
+     * 记录测试类下有哪些测试方法
+     *
+     * @param testMethods 测试方法签名集合
+     * @return
+     */
+    public Hashtable<String, Set<String>> recordMethodsUnderTestClass(Set<String> testMethods);
+
+    /**
+     * 记录测试类依赖了哪些类
+     * @param classesCalledByTest 测试方法调用的类集合
+     * @return
+     */
+    public Hashtable<String, Set<String>> recordClassesCalledByTestClass(Hashtable<String, Set<String>> classesCalledByTest);
+}
