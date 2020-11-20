@@ -23,10 +23,13 @@ public class TestUtil {
 
     @Test
     public void DataLogTest() throws IOException {
-        Set<String> classLevelRes = readFile("selection-class-DataLog.txt");
-        Set<String> methodLevelRes = readFile("selection-method-DataLog.txt");
-        Set<String> classLevelData = readFile( "E:\\SE\\AutomatedTesting\\walarepo\\wala\\Data\\2-DataLog\\data\\selection-class.txt");
-        Set<String> methodLevelData = readFile("E:\\SE\\AutomatedTesting\\file\\经典大作业\\ClassicAutomatedTesting\\2-DataLog\\data\\selection-method.txt");
+
+        //Set<String> classLevelRes = readFile("selection-class-DataLog.txt");
+        //Set<String> methodLevelRes = readFile("selection-method-DataLog.txt");
+        Set<String> classLevelRes = readFile("C:\\Users\\Administrator\\Desktop\\report\\report\\class-DataLog.txt");
+        Set<String> methodLevelRes = readFile("C:\\Users\\Administrator\\Desktop\\report\\report\\method-DataLog.txt");
+        Set<String> classLevelData = readFile( "E:\\Study\\SE\\大三\\自己资料\\自动化测试\\code\\wala\\Automated-Testing\\Data\\2-DataLog\\data\\selection-class.txt");
+        Set<String> methodLevelData = readFile("E:\\Study\\SE\\大三\\自己资料\\自动化测试\\code\\wala\\Automated-Testing\\Data\\2-DataLog\\data\\selection-method.txt");
         assertTrue(cmpRes(classLevelRes, classLevelData));
         assertTrue(cmpRes(methodLevelRes, methodLevelData));
     }
